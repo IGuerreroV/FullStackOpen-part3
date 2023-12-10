@@ -1,7 +1,10 @@
 const express = require('express')
 const morgan = require('morgan')
+const cors = require('cors')
+
 const app = express()
 
+app.use(cors())
 app.use(express.json())
 
 // Middlewares
@@ -25,7 +28,7 @@ let persons = [
     {
         id: 3,
         name: "Dan Abramov",
-        numer: "12345678"
+        number: "1234567"
     },
     {
         id: 4,
@@ -113,7 +116,7 @@ app.post('/api/persons', (request, response) => {
     response.json(newPerson)
 })
 
-const PORT = 3001
+const PORT =  process.env.PORT || 3001
 app.listen(PORT, () => {
     console.log(`Server runing on port ${PORT}`);
 })
