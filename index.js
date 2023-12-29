@@ -29,7 +29,7 @@ app.get('/info', (request, response) => {
     const now = Date.now()
     const date = new Date(now)
 
-    response.status(200).send(`<h1>Phonebook has info for ${persons.length} people</h1> <p>${date}</p>` )
+    response.status(200).send(`<h1>Phonebook has info for ${Person.length} people</h1> <p>${date}</p>` )
 })
 
 app.get('/api/persons', (request, response) => {
@@ -68,7 +68,7 @@ app.delete('/api/persons/:id', (request, response, next) => {
 //     return maxId + 1
 // }
 
-app.post('/api/persons', (request, response,) => {
+app.post('/api/persons', (request, response, next) => {
     const person = request.body
     const name = request.body.name
     console.log(person);
@@ -98,7 +98,21 @@ app.post('/api/persons', (request, response,) => {
 
     newPerson.save().then(savedPerson => {
         response.json(savedPerson)
-    })
+    }).catch(error => next(error))
+})
+
+app.put('/api/persons/:id', (request, response, next) => {
+    const { id } = request.params
+    const body = request.body
+
+    const personUpdate = {
+        number: body.number
+    }
+
+    Person.findByIdAndUpdate(id, personUpdate, { new: true })
+    .then(updatePerson => {
+        response.json(updatePerson)
+    }).catch(error => next(error))
 })
 
 const unknownEndpoint = (request, response) => {
@@ -108,9 +122,9 @@ const unknownEndpoint = (request, response) => {
 const handleError = (error, request, response, next) => {
     console.error(error.message);
 
-    return error.name === 'CastError'
-    ? response.status(400).send({ error: 'id used is malformed'})
-    : response.status(500).end()
+    error.name === 'CastError'
+        ? response.status(400).send({ error: 'id used is malformed'})
+        : response.status(500).end()
 
     next(error)
 }
