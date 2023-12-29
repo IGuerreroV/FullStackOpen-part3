@@ -9,3 +9,7 @@ mongoose.connect(connectionString)
 .catch((error) => {
     console.log('error connecting to MongoDB', error.message);
 })
+
+process.on('uncaughtException', () => {
+    mongoose.connection.disconnect()
+})

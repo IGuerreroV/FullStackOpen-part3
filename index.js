@@ -10,9 +10,9 @@ const app = express()
 
 app.use(cors())
 app.use(express.json())
+app.use(express.static('dist'))
 
 // Middlewares
-app.use(express.static('dist'))
 morgan.token('body', (request, response) => {
         return JSON.stringify(request.body)
     })
@@ -68,7 +68,7 @@ app.delete('/api/persons/:id', (request, response, next) => {
 //     return maxId + 1
 // }
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response,) => {
     const person = request.body
     const name = request.body.name
     console.log(person);
@@ -105,19 +105,18 @@ const unknownEndpoint = (request, response) => {
     response.status(404).end()
 }
 
+const handleError = (error, request, response, next) => {
+    console.error(error.message);
+
+    return error.name === 'CastError'
+    ? response.status(400).send({ error: 'id used is malformed'})
+    : response.status(500).end()
+
+    next(error)
+}
+
 app.use(unknownEndpoint)
-
-app.use((error, request, response, next) => {
-    console.error(error);
-
-    if(error.name === 'CastError') {
-        response.status(400).send({
-            error: 'id used is malformed'
-        })
-    } else {
-        response.status(500).end()
-    }
-})
+app.use(handleError)
 
 const PORT =  process.env.PORT
 app.listen(PORT, () => {
