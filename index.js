@@ -96,9 +96,13 @@ app.post('/api/persons', (request, response, next) => {
     })
     console.log(newPerson);
 
-    newPerson.save().then(savedPerson => {
-        response.json(savedPerson)
-    }).catch(error => next(error))
+    newPerson
+        .save()
+        .then(savedPerson => savedPerson.toJSON())
+        .then(savedAndFormattedPerson => {
+            response.json(savedAndFormattedPerson)
+        })
+    .catch(error => next(error))
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
@@ -122,9 +126,11 @@ const unknownEndpoint = (request, response) => {
 const handleError = (error, request, response, next) => {
     console.error(error.message);
 
-    error.name === 'CastError'
-        ? response.status(400).send({ error: 'id used is malformed'})
-        : response.status(500).end()
+    if(error.name === 'CastError') {
+        return response.status(400).send({ error: 'id used is malformed' })
+    } else if (error.name === 'ValidationError' ){
+        return response.status(400).json({ error: error.message })
+    }
 
     next(error)
 }
