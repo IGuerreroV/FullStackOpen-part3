@@ -3,13 +3,13 @@ const mongoose = require('mongoose')
 const connectionString = process.env.MONGODB_URI
 
 mongoose.connect(connectionString)
-.then(result => {
-    console.log('connected to MongoDB');
-})
-.catch((error) => {
-    console.log('error connecting to MongoDB', error.message);
-})
+  .then(result => {
+    console.log('connected to MongoDB')
+  })
+  .catch((error) => {
+    console.log('error connecting to MongoDB', error.message)
+  })
 
 process.on('uncaughtException', () => {
-    mongoose.connection.disconnect()
+  mongoose.connection.disconnect()
 })
